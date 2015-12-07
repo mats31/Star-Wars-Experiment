@@ -20,8 +20,9 @@ export default class Saber extends THREE.Object3D {
     this.positions = clone(this.geometry.attributes.position.array);
 
     this.uniforms = {
-      color: { type: 'c', value: new THREE.Color( 'red' ) },
+      color: { type: 'c', value: new THREE.Color( 'blue' ) },
     };
+
     this.material = new THREE.ShaderMaterial( {
       uniforms: this.uniforms,
       vertexShader: document.getElementById( 'vertexshader' ).textContent,
@@ -53,7 +54,7 @@ export default class Saber extends THREE.Object3D {
     };
 
     for (let i = 0; i < 9; i++) {
-      const light = new THREE.PointLight( 'red', 1000000, 700 );
+      const light = new THREE.PointLight( 'blue', 1000000, 700 );
       light.position.set( this.lightPositions[i][0], this.lightPositions[i][1], this.lightPositions[i][2]);
       this.lights.push( light );
       this.add( light );
@@ -65,8 +66,20 @@ export default class Saber extends THREE.Object3D {
         document.getElementById('degaine').pause();
         document.getElementById('degaine').currentTime = 0;
         document.getElementById('degaine').play();
+
+        document.getElementById('on').pause();
+        document.getElementById('on').currentTime = 0;
+        document.getElementById('on').loop = true;
+        document.getElementById('on').volume = 0.1;
+        document.getElementById('on').play();
         this.activeLight = true;
       } else {
+        document.getElementById('degaine').currentTime = 0;
+        document.getElementById('degaine').pause();
+
+        document.getElementById('on').currentTime = 0;
+        document.getElementById('on').pause();
+
         document.getElementById('off').pause();
         document.getElementById('off').currentTime = 0;
         document.getElementById('off').play();

@@ -3,6 +3,7 @@ window.THREE = THREE;
 import Cube from './objects/Cube';
 import Saber from './objects/Saber';
 import Plane from './objects/Plane';
+import Shot from './objects/Shot';
 import RenderPass from './postprocessing/RenderPass';
 import ShaderPass from './postprocessing/ShaderPass';
 import BloomPass from './postprocessing/BloomPass';
@@ -44,6 +45,15 @@ export default class Webgl {
 
     this.ground = new Plane();
     this.scene.add( this.ground );
+
+    this.shots = [];
+    (function loop(that) {
+      const rand = Math.round(Math.random() * (3000 - 500)) + 500;
+      setTimeout(() => {
+        that.laserGame();
+        loop(that);
+      }, rand);
+    }(this));
   }
 
   prepareRaycaster() {
@@ -105,10 +115,16 @@ export default class Webgl {
       console.log(intersect);
       const point = intersect[ 0 ].point;
       this.saber.position.set( point.x, point.y, this.saber.position.z);
-      console.log('intersect !');
-    } else {
-      console.log('not intersect !');
     }
+  }
+
+  laserGame() {
+    console.log('laser');
+    const shot = new Shot();
+    shot.position.set(0, 500, 0);
+    shot.rotation.x = 5;
+    this.shots.push(shot);
+    this.scene.add(shot);
   }
 
   render() {
@@ -116,6 +132,16 @@ export default class Webgl {
 
     this.saber.update();
     this.cube.update();
+
+    for (let i = 0; i < this.shots.length; i++) {
+      this.shots[i].position.z += 40;
+      if (this.shots[i].position.z > 3000) {
+        console.log('removed');
+        this.scene.remove(this.shots[i]);
+        this.shots.splice(i, 1);
+      }
+    }
+
     if (this.params.usePostprocessing) {
       this.composer.render();
     }

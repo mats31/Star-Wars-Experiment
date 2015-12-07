@@ -1,4 +1,5 @@
 import THREE from 'three';
+import PlaneShader from '../shaders/PlaneShader.js';
 
 export default class Plane extends THREE.Object3D {
   constructor() {
@@ -6,6 +7,7 @@ export default class Plane extends THREE.Object3D {
 
     const glslify = require('glslify');
 
+    this.planeShader = new PlaneShader();
     this.modelGeometry = new THREE.PlaneGeometry( 20000, 20000, 32, 5000, 5000 );
     this.geometry = new THREE.BufferGeometry().fromGeometry( this.modelGeometry );
 
@@ -19,14 +21,16 @@ export default class Plane extends THREE.Object3D {
           'textures/noise.jpg',
           ( noise ) => {
             console.log( noise );
-            this.uniforms = {
-              map: { type: 't', value: map },
-              noise: { type: 't', value: noise }
-            };
+            this.uniforms = this.planeShader.uniforms;
+            this.uniforms.map.value = map;
+            this.uniforms.noise.value = noise;
+            this.uniforms.diffuse.value = new THREE.Color(0xFFFFFF);
+            console.log(this.uniforms);
             this.material = new THREE.ShaderMaterial( {
               uniforms: this.uniforms,
-              vertexShader: glslify( '../shaders/planeShader.vert' ),
-              fragmentShader: glslify( '../shaders/planeShader.frag' ),
+              vertexShader: this.planeShader.vertexShader,
+              fragmentShader: this.planeShader.fragmentShader,
+              lights: true,
             });
             this.plane = new THREE.Mesh( this.geometry, this.material );
             this.plane.position.set(0, -800, 0);
