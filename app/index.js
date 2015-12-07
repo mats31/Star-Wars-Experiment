@@ -14,18 +14,25 @@ document.body.appendChild(webgl.renderer.domElement);
 gui = new dat.GUI();
 gui.add(webgl.params, 'usePostprocessing');
 
-// handle resize
-window.addEventListener('resize', resizeHandler);
-
-// let's play !
-animate();
-
-function resizeHandler() {
-  webgl.resize(window.innerWidth, window.innerHeight);
-}
-
 function animate() {
   raf(animate);
 
   webgl.render();
 }
+
+function resizeHandler() {
+  webgl.resize(window.innerWidth, window.innerHeight);
+}
+
+function onDocumentMouseMove(e) {
+  webgl.moveSaber(e);
+}
+
+// handle resize
+window.addEventListener('resize', resizeHandler);
+
+// Mouse down
+window.addEventListener('mousemove', onDocumentMouseMove);
+
+// let's play !
+animate();
