@@ -136,7 +136,6 @@ export default class Webgl {
     for (let i = 0; i < this.shots.length; i++) {
       this.shots[i].position.z += 40;
       if (this.shots[i].position.z > 3000) {
-        console.log('removed');
         this.scene.remove(this.shots[i]);
         this.shots.splice(i, 1);
       }
