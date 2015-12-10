@@ -4,6 +4,7 @@ import Cube from './objects/Cube';
 import Saber from './objects/Saber';
 import Plane from './objects/Plane';
 import Shot from './objects/Shot';
+import Snow from './objects/Snow';
 import RenderPass from './postprocessing/RenderPass';
 import ShaderPass from './postprocessing/ShaderPass';
 import BloomPass from './postprocessing/BloomPass';
@@ -39,12 +40,17 @@ export default class Webgl {
 
     this.saber = new Saber();
     this.scene.add( this.saber );
+    this.saber.position.z = 1000;
 
-    this.cube = new Cube();
-    this.scene.add( this.cube );
+    // this.cube = new Cube();
+    // this.scene.add( this.cube );
 
     this.ground = new Plane();
     this.scene.add( this.ground );
+
+    this.snow = new Snow();
+    this.scene.add( this.snow );
+    // this.scene.fog = new THREE.FogExp2( 0x000000, 0.0008 );
 
     this.shots = [];
     (function loop(that) {
@@ -112,30 +118,62 @@ export default class Webgl {
 
     const intersect = this.raycaster.intersectObject( this.plane );
     if (intersect.length > 0) {
-      console.log(intersect);
       const point = intersect[ 0 ].point;
       this.saber.position.set( point.x, point.y, this.saber.position.z);
     }
   }
 
   laserGame() {
-    console.log('laser');
     const shot = new Shot();
-    shot.position.set(0, 500, 0);
-    shot.rotation.x = 5;
+    shot.position.set( ( Math.random() * (700 - (-700)) + (-700) ), ( Math.random() * (700 - (300)) + (300) ), 0);
+    shot.rotation.x = Math.PI / 2;
+    shot.parade = false;
     this.shots.push(shot);
     this.scene.add(shot);
+  }
+
+  checkParade(shot) {
+    if (shot.position.z > 1000) {
+      if ( shot.position.x <= this.saber.position.x + 300 && shot.position.x >= this.saber.position.x - 300 && shot.position.y <= this.saber.position.y + 800 && shot.position.y >= this.saber.position.y - 400 && shot.position.z <= this.camera.position.z ) {
+        const rand = Math.random();
+
+        if (rand > 0.5) {
+          document.getElementById('parade').pause();
+          document.getElementById('parade').currentTime = 0;
+          document.getElementById('parade').play();
+        } else {
+          document.getElementById('parade2').pause();
+          document.getElementById('parade2').currentTime = 0;
+          document.getElementById('parade2').play();
+        }
+
+        shot.parade = true;
+        return true;
+      }
+    }
+
+    return false;
   }
 
   render() {
     this.renderer.render(this.scene, this.camera);
 
     this.saber.update();
-    this.cube.update();
+    this.snow.update();
 
     for (let i = 0; i < this.shots.length; i++) {
-      this.shots[i].position.z += 40;
-      if (this.shots[i].position.z > 3000) {
+      if (this.shots[i].parade) {
+        this.shots[i].position.z -= 40;
+      } else {
+        if ( this.checkParade( this.shots[i] ) ) {
+          break;
+        }
+        this.shots[i].position.z += 40;
+        this.shots[i].position.x += -this.shots[i].position.x * 0.01;
+        this.shots[i].position.y += -this.shots[i].position.y * 0.01;
+      }
+
+      if (this.shots[i].position.z > 3000 || this.shots[i].position.z < -500) {
         this.scene.remove(this.shots[i]);
         this.shots.splice(i, 1);
       }
