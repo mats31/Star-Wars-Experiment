@@ -50,7 +50,7 @@ export default class Webgl {
 
     this.snowflake = new Snowflake();
     this.snowflake.position.set(0, 0, 800);
-    this.snowflake.scale.set(10, 10, 10);
+    this.snowflake.scale.set(1, 1, 1);
     this.scene.add(this.snowflake);
 
     // this.cube = new Cube();

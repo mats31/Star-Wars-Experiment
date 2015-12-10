@@ -33,8 +33,8 @@ export default class Snowflake extends THREE.Object3D {
     document.body.onclick = function() {
       if (!clicked) {
         //TweenMax.to(material.uniforms.move, 2, {value: 1.0, ease: Power1.easeOut});
-        TweenMax.to(material.uniforms.ice, 1, {value: 10.0, ease: Power2.easeOut});
-        TweenMax.to(material.uniforms.space, 1, {value: 5.0, ease: Power2.easeOut});
+        TweenMax.to(material.uniforms.ice, 1, {value: 2000.0, ease: Power2.easeOut});
+        TweenMax.to(material.uniforms.space, 1, {value: 150.0, ease: Power2.easeOut});
         clicked = true;
       }
       else {
@@ -74,7 +74,7 @@ export default class Snowflake extends THREE.Object3D {
     });
 
     this.loader = new THREE.OBJLoader( this.manager );
-    this.loader.load( 'model/snowflake.obj', function ( object ) {
+    this.loader.load( 'model/gifts.obj', function ( object ) {
       loadedObject = object;
 
       object.traverse( function ( child ) {
@@ -115,7 +115,7 @@ export default class Snowflake extends THREE.Object3D {
     material.uniforms[ 'time' ].value = .00025 * ( Date.now() - start );
     if (loadedObject) {
       loadedObject.rotation.y += 0.01;
-      loadedObject.rotation.x += 0.01;
+      loadedObject.rotation.x += 0.001;
       particleSystem.rotation.y += 0.02;
       particleSystem.rotation.x -= 0.01;
     }
