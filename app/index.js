@@ -13,6 +13,15 @@ document.body.appendChild(webgl.renderer.domElement);
 // GUI settings
 gui = new dat.GUI();
 gui.add(webgl.params, 'usePostprocessing');
+gui.add(webgl.vignette.params, 'boost' ).min(0).max(10);
+gui.add(webgl.vignette.params, 'reduction' ).min(0).max(10);
+gui.add(webgl.bloomPass.params, 'blendMode' ).min(0).max(10);
+gui.add(webgl.bloomPass.params, 'blurAmount' ).min(0).max(10);
+
+gui.add(webgl.hemiLight, 'intensity' ).min(0).max(10);
+gui.add(webgl.hemiLight.position, 'x' ).min(0).max(1000);
+gui.add(webgl.hemiLight.position, 'y' ).min(0).max(1000);
+gui.add(webgl.hemiLight.position, 'z' ).min(0).max(1000);
 
 function animate() {
   raf(animate);
