@@ -36,7 +36,7 @@ export default class Snow extends THREE.Object3D {
   }
 
   setGeometry() {
-    for ( let i = 0; i < 10000; i ++ ) {
+    for ( let i = 0; i < 5000; i ++ ) {
       const vertex = new THREE.Vector3();
       vertex.x = Math.random() * 6000 - 3000;
       vertex.y = Math.random() * 6000 - 3000;

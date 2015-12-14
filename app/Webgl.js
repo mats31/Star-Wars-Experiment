@@ -21,7 +21,7 @@ import FXAAPass from '@superguigui/wagner/src/passes/fxaa/FXAAPass';
 export default class Webgl {
   constructor(width, height) {
     this.params = {
-      usePostprocessing: true,
+      usePostprocessing: false,
     };
 
     this.scene = new THREE.Scene();
@@ -48,10 +48,10 @@ export default class Webgl {
     this.scene.add( this.saber );
     this.saber.position.z = 1000;
 
-    this.snowflake = new Snowflake();
-    this.snowflake.position.set(0, 0, 800);
-    this.snowflake.scale.set(1, 1, 1);
-    this.scene.add(this.snowflake);
+    // this.snowflake = new Snowflake();
+    // this.snowflake.position.set(0, 0, 800);
+    // this.snowflake.scale.set(1, 1, 1);
+    // this.scene.add(this.snowflake);
 
     // this.cube = new Cube();
     // this.scene.add( this.cube );
@@ -61,7 +61,7 @@ export default class Webgl {
 
     this.snow = new Snow();
     this.scene.add( this.snow );
-    //this.scene.fog = new THREE.FogExp2( 0x000000, 0.0008 );
+    // this.scene.fog = new THREE.FogExp2( 0x000000, 0.0008 );
 
     this.shots = [];
     (function loop(that) {
@@ -176,6 +176,7 @@ export default class Webgl {
         }
 
         shot.parade = true;
+        this.saber.animParade();
         return true;
       }
     }
@@ -188,7 +189,7 @@ export default class Webgl {
 
     this.saber.update();
     this.snow.update();
-    this.snowflake.update();
+    // this.snowflake.update();
 
     for (let i = 0; i < this.shots.length; i++) {
       if (this.shots[i].parade) {
@@ -197,7 +198,7 @@ export default class Webgl {
         if ( this.checkParade( this.shots[i] ) ) {
           break;
         }
-        this.shots[i].position.z += 40;
+        this.shots[i].position.z += ( 5000 - this.shots[i].position.z ) * 0.02;
         this.shots[i].position.x += -this.shots[i].position.x * 0.01;
         this.shots[i].position.y += -this.shots[i].position.y * 0.01;
       }

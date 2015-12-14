@@ -44,7 +44,9 @@ export default class Saber extends THREE.Object3D {
       [0, 350, 0],
       [0, 250, 0],
     ];
+
     this.activeLight = false;
+    this.isWard = false;
 
     const PI2 = Math.PI * 2;
     const program = function program( context ) {
@@ -89,7 +91,15 @@ export default class Saber extends THREE.Object3D {
     });
   }
 
+  animParade() {
+    const tl = new TimelineLite();
+    tl.from(this.rotation, 0.5, {z: Math.PI / 6, x: -Math.PI / 6});
+  }
+
   update() {
+    // if (this.isWard) {
+    //   this.animParade();
+    // }
     if (!this.active) {
       for (let i = 0, i3 = 0; i < this.cylinder.geometry.attributes.position.array.length; i++, i3 += 3) {
         this.cylinder.geometry.attributes.position.array[i3 + 1] += (-500 - this.cylinder.geometry.attributes.position.array[i3 + 1]) * 0.1;
