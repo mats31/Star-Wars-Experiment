@@ -7,7 +7,7 @@ export default class Saber extends THREE.Object3D {
   constructor() {
     super();
 
-    this.active = false;
+    this.active = true;
 
     const manager = new THREE.LoadingManager();
     const loader = new THREE.OBJLoader( manager );
@@ -45,7 +45,7 @@ export default class Saber extends THREE.Object3D {
       [0, 250, 0],
     ];
 
-    this.activeLight = false;
+    this.activeLight = true;
     this.isWard = false;
 
     const PI2 = Math.PI * 2;
@@ -63,37 +63,87 @@ export default class Saber extends THREE.Object3D {
     }
     this.add( this.cylinder );
 
-    window.addEventListener('click', () => {
-      if (!this.active) {
-        document.getElementById('degaine').pause();
-        document.getElementById('degaine').currentTime = 0;
-        document.getElementById('degaine').play();
-
-        document.getElementById('on').pause();
-        document.getElementById('on').currentTime = 0;
-        document.getElementById('on').loop = true;
-        document.getElementById('on').volume = 0.1;
-        document.getElementById('on').play();
-        this.activeLight = true;
-      } else {
-        document.getElementById('degaine').currentTime = 0;
-        document.getElementById('degaine').pause();
-
-        document.getElementById('on').currentTime = 0;
-        document.getElementById('on').pause();
-
-        document.getElementById('off').pause();
-        document.getElementById('off').currentTime = 0;
-        document.getElementById('off').play();
-        this.activeLight = false;
-      }
-      this.active = !this.active;
-    });
+    // window.addEventListener('click', () => {
+    //   if (!this.active) {
+    //     document.getElementById('degaine').pause();
+    //     document.getElementById('degaine').currentTime = 0;
+    //     document.getElementById('degaine').play();
+    //
+    //     document.getElementById('on').pause();
+    //     document.getElementById('on').currentTime = 0;
+    //     document.getElementById('on').loop = true;
+    //     document.getElementById('on').volume = 0.1;
+    //     document.getElementById('on').play();
+    //     this.activeLight = true;
+    //   } else {
+    //     document.getElementById('degaine').currentTime = 0;
+    //     document.getElementById('degaine').pause();
+    //
+    //     document.getElementById('on').currentTime = 0;
+    //     document.getElementById('on').pause();
+    //
+    //     document.getElementById('off').pause();
+    //     document.getElementById('off').currentTime = 0;
+    //     document.getElementById('off').play();
+    //     this.activeLight = false;
+    //   }
+    //   this.active = !this.active;
+    // });
   }
 
   animParade() {
     const tl = new TimelineLite();
-    tl.from(this.rotation, 0.5, {z: Math.PI / 6, x: -Math.PI / 6});
+    const rand = Math.floor( Math.random() * ( 4 - 1 ) ) + 1;
+
+    switch (rand) {
+      case 1:
+      tl.to(this.rotation, 0.25, {z: Math.PI / 6, x: Math.PI / 6});
+      tl.to(this.rotation, 0.25, {z: 0, x: 0});
+      case 2:
+      tl.to(this.rotation, 0.25, {z: Math.PI / 6, x: -Math.PI / 6});
+      tl.to(this.rotation, 0.25, {z: 0, x: 0});
+      break;
+      case 3:
+      tl.to(this.rotation, 0.25, {z: -Math.PI / 6, x: Math.PI / 6});
+      tl.to(this.rotation, 0.25, {z: 0, x: 0});
+      break;
+      case 4:
+      tl.to(this.rotation, 0.25, {z: -Math.PI / 6, x: -Math.PI / 6});
+      tl.to(this.rotation, 0.25, {z: 0, x: 0});
+      break;
+      default:
+      tl.to(this.rotation, 0.25, {z: -Math.PI / 5, x: -Math.PI / 5});
+      tl.to(this.rotation, 0.25, {z: 0, x: 0});
+      break;
+    }
+  }
+
+  animAttack() {
+    const tl = new TimelineLite();
+    const rand = Math.floor( Math.random() * ( 5 - 1 ) ) + 1;
+
+    switch (rand) {
+      case 1:
+      tl.to(this.rotation, 0.25, {z: -Math.PI / 4, x: Math.PI / 6});
+      tl.to(this.rotation, 0.25, {z: 0, x: 0});
+      case 2:
+      tl.to(this.rotation, 0.25, {z: Math.PI / 4, x: -Math.PI / 5});
+      tl.to(this.rotation, 0.25, {z: 0, x: 0});
+      break;
+      case 3:
+      tl.to(this.rotation, 0.25, {z: -Math.PI / 4, x: Math.PI / 4});
+      tl.to(this.rotation, 0.25, {z: 0, x: 0});
+      break;
+      case 4:
+      tl.to(this.rotation, 0.25, {z: Math.PI / 4, x: -Math.PI / 3});
+      tl.to(this.rotation, 0.25, {z: 0, x: 0});
+      break;
+      default:
+      tl.to(this.rotation, 0.25, {z: -Math.PI / 5, x: -Math.PI / 5});
+      tl.to(this.rotation, 0.25, {z: 0, x: 0});
+      break;
+    }
+
   }
 
   update() {

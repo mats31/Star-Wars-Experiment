@@ -17,12 +17,12 @@ gui.add(webgl.vignette.params, 'boost' ).min(0).max(10);
 gui.add(webgl.vignette.params, 'reduction' ).min(0).max(10);
 gui.add(webgl.bloomPass.params, 'blendMode' ).min(0).max(10);
 gui.add(webgl.bloomPass.params, 'blurAmount' ).min(0).max(10);
+gui.add(webgl.params, 'volume' ).min(0).max(1);
 
 // gui.add(webgl.hemiLight, 'intensity' ).min(0).max(10);
 // gui.add(webgl.hemiLight.position, 'x' ).min(0).max(1000);
 // gui.add(webgl.hemiLight.position, 'y' ).min(0).max(1000);
 // gui.add(webgl.hemiLight.position, 'z' ).min(0).max(1000);
-
 
 function animate() {
   raf(animate);
@@ -38,11 +38,27 @@ function onDocumentMouseMove(e) {
   webgl.moveSaber(e);
 }
 
+function onDocumentClick(e) {
+  webgl.attackSaber(e);
+}
+
 // handle resize
 window.addEventListener('resize', resizeHandler);
 
-// Mouse down
+// Mouse move
 window.addEventListener('mousemove', onDocumentMouseMove);
+
+// Mouse click
+window.addEventListener('click', onDocumentClick);
+
+// Tests tab active
+window.onfocus = function onFocus() {
+  webgl.tabIsActive = true;
+};
+
+window.onblur = function onBlur() {
+  webgl.tabIsActive = false;
+};
 
 // let's play !
 animate();

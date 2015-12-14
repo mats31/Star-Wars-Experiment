@@ -33,6 +33,10 @@ export default class Webgl {
     this.renderer.setSize(width, height);
     this.renderer.setClearColor('#2c3e50');
 
+    this.tabIsActive = true;
+
+    this.params.volume = 0.5;
+
     this.composer = null;
     this.initPostprocessing();
 
@@ -46,7 +50,7 @@ export default class Webgl {
 
     this.saber = new Saber();
     this.scene.add( this.saber );
-    this.saber.position.z = 1000;
+    this.saber.position.z = 1500;
 
     // this.snowflake = new Snowflake();
     // this.snowflake.position.set(0, 0, 800);
@@ -63,11 +67,26 @@ export default class Webgl {
     this.scene.add( this.snow );
     // this.scene.fog = new THREE.FogExp2( 0x000000, 0.0008 );
 
+    // Random shots
     this.shots = [];
+    (function loop(that) {
+      const rand = Math.round(Math.random() * (5000 - 1000)) + 1000;
+      setTimeout(() => {
+        if (that.tabIsActive) {
+          that.laserGame();
+        }
+        loop(that);
+      }, rand);
+    }(this));
+
+    // Random snowflake
+    this.snowflakes = [];
     (function loop(that) {
       const rand = Math.round(Math.random() * (3000 - 500)) + 500;
       setTimeout(() => {
-        that.laserGame();
+        if (that.tabIsActive) {
+          that.snowflakePop();
+        }
         loop(that);
       }, rand);
     }(this));
@@ -151,18 +170,48 @@ export default class Webgl {
     }
   }
 
+  attackSaber() {
+    this.saber.animAttack();
+
+    for (let i = 0; i < this.snowflakes.length; i++) {
+      if ( this.snowflakes[i].position.x <= this.saber.position.x + 300 && this.snowflakes[i].position.x >= this.saber.position.x - 300 && this.snowflakes[i].position.y <= this.saber.position.y + 800 && this.snowflakes[i].position.y >= this.saber.position.y - 400 && this.snowflakes[i].position.z <= this.saber.position.z + 200 && this.snowflakes[i].position.z >= this.saber.position.z - 600 ) {
+        this.snowflakes[i].destroy();
+      }
+    }
+  }
+
   laserGame() {
     const shot = new Shot();
-    shot.position.set( ( Math.random() * (700 - (-700)) + (-700) ), ( Math.random() * (700 - (300)) + (300) ), 0);
+    const rand = Math.random();
+
+    shot.position.set( ( Math.random() * (700 - (-700)) + (-700) ), ( Math.random() * (400 - (100)) + (100) ), -1000);
     shot.rotation.x = Math.PI / 2;
     shot.parade = false;
     this.shots.push(shot);
     this.scene.add(shot);
+
+    if (rand > 0.5) {
+      document.getElementById('laser1').pause();
+      document.getElementById('laser1').currentTime = 0;
+      document.getElementById('laser1').play();
+    } else {
+      document.getElementById('laser2').pause();
+      document.getElementById('laser2').currentTime = 0;
+      document.getElementById('laser2').play();
+    }
+  }
+
+  snowflakePop() {
+    const snowflake = new Snowflake();
+
+    snowflake.position.set( ( Math.random() * (700 - (-700)) + (-700) ), ( Math.random() * (400 - (10)) + (10) ), -1000);
+    this.snowflakes.push(snowflake);
+    this.scene.add(snowflake);
   }
 
   checkParade(shot) {
     if (shot.position.z > 1000) {
-      if ( shot.position.x <= this.saber.position.x + 300 && shot.position.x >= this.saber.position.x - 300 && shot.position.y <= this.saber.position.y + 800 && shot.position.y >= this.saber.position.y - 400 && shot.position.z <= this.camera.position.z ) {
+      if ( shot.position.x <= this.saber.position.x + 300 && shot.position.x >= this.saber.position.x - 300 && shot.position.y <= this.saber.position.y + 800 && shot.position.y >= this.saber.position.y - 400 && shot.position.z <= this.saber.position.z + 200 && shot.position.z >= this.saber.position.z - 600 ) {
         const rand = Math.random();
 
         if (rand > 0.5) {
@@ -184,13 +233,27 @@ export default class Webgl {
     return false;
   }
 
+  setVolume() {
+    document.getElementById('parade').volume = this.params.volume;
+    document.getElementById('parade2').volume = this.params.volume;
+    document.getElementById('laser1').volume = this.params.volume;
+    document.getElementById('laser2').volume = this.params.volume;
+    document.getElementById('degaine').volume = this.params.volume;
+    document.getElementById('on').volume = this.params.volume;
+    document.getElementById('off').volume = this.params.volume;
+  }
+
   render() {
     this.renderer.render(this.scene, this.camera);
 
     this.saber.update();
     this.snow.update();
-    // this.snowflake.update();
+    for (let i = 0; i < this.snowflakes.length; i++) {
+      this.snowflakes[i].update();
+    }
+    this.setVolume();
 
+    /* Shots */
     for (let i = 0; i < this.shots.length; i++) {
       if (this.shots[i].parade) {
         this.shots[i].position.z -= 40;
@@ -203,9 +266,21 @@ export default class Webgl {
         this.shots[i].position.y += -this.shots[i].position.y * 0.01;
       }
 
-      if (this.shots[i].position.z > 3000 || this.shots[i].position.z < -500) {
+      if (this.shots[i].position.z > 3000 || this.shots[i].position.z < -1100) {
         this.scene.remove(this.shots[i]);
         this.shots.splice(i, 1);
+      }
+    }
+
+    /* Snowflakes */
+    for (let i = 0; i < this.snowflakes.length; i++) {
+      this.snowflakes[i].position.z += ( 5000 - this.snowflakes[i].position.z ) * 0.02;
+      this.snowflakes[i].position.x += -this.snowflakes[i].position.x * 0.01;
+      this.snowflakes[i].position.y += -this.snowflakes[i].position.y * 0.01;
+
+      if (this.snowflakes[i].position.z > 3000) {
+        this.scene.remove(this.snowflakes[i]);
+        this.snowflakes.splice(i, 1);
       }
     }
 
