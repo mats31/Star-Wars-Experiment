@@ -61,10 +61,10 @@ export default class Webgl {
     // this.scene.add( this.cube );
 
     this.ground = new Plane();
-    this.scene.add( this.ground );
+    //this.scene.add( this.ground );
 
     this.snow = new Snow();
-    this.scene.add( this.snow );
+    //this.scene.add( this.snow );
     // this.scene.fog = new THREE.FogExp2( 0x000000, 0.0008 );
 
     // Random shots
@@ -174,7 +174,7 @@ export default class Webgl {
     this.saber.animAttack();
 
     for (let i = 0; i < this.snowflakes.length; i++) {
-      if ( this.snowflakes[i].position.x <= this.saber.position.x + 300 && this.snowflakes[i].position.x >= this.saber.position.x - 300 && this.snowflakes[i].position.y <= this.saber.position.y + 800 && this.snowflakes[i].position.y >= this.saber.position.y - 400 && this.snowflakes[i].position.z <= this.saber.position.z + 200 && this.snowflakes[i].position.z >= this.saber.position.z - 600 ) {
+      if ( this.snowflakes[i].position.x <= this.saber.position.x + 300 && this.snowflakes[i].position.x >= this.saber.position.x - 300 && this.snowflakes[i].position.y <= this.saber.position.y + 800 && this.snowflakes[i].position.y >= this.saber.position.y - 400 && this.snowflakes[i].position.z <= this.saber.position.z + 200 && this.snowflakes[i].position.z >= this.saber.position.z - 400 ) {
         this.snowflakes[i].destroy();
       }
     }
@@ -211,7 +211,7 @@ export default class Webgl {
 
   checkParade(shot) {
     if (shot.position.z > 1000) {
-      if ( shot.position.x <= this.saber.position.x + 300 && shot.position.x >= this.saber.position.x - 300 && shot.position.y <= this.saber.position.y + 800 && shot.position.y >= this.saber.position.y - 400 && shot.position.z <= this.saber.position.z + 200 && shot.position.z >= this.saber.position.z - 600 ) {
+      if ( shot.position.x <= this.saber.position.x + 150 && shot.position.x >= this.saber.position.x - 150 && shot.position.y <= this.saber.position.y + 800 && shot.position.y >= this.saber.position.y - 400 && shot.position.z <= this.saber.position.z + 200 && shot.position.z >= this.saber.position.z - 300 ) {
         const rand = Math.random();
 
         if (rand > 0.5) {
@@ -258,9 +258,10 @@ export default class Webgl {
       if (this.shots[i].parade) {
         this.shots[i].position.z -= 40;
       } else {
-        if ( this.checkParade( this.shots[i] ) ) {
-          break;
-        }
+        // if ( this.checkParade( this.shots[i] ) ) {
+        //   break;
+        // }
+        this.checkParade( this.shots[i] );
         this.shots[i].position.z += ( 5000 - this.shots[i].position.z ) * 0.02;
         this.shots[i].position.x += -this.shots[i].position.x * 0.01;
         this.shots[i].position.y += -this.shots[i].position.y * 0.01;

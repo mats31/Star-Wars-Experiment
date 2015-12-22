@@ -24,22 +24,68 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.0/TweenLite.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.0/TimelineLite.min.js"></script>
   <script type="x-shader/x-vertex" id="vertexshader">
+    uniform vec3 uPointA;
+    uniform vec3 uPointB;
+    uniform float uMultiplier;
+    uniform float uNearPlaneValue;
+    varying float vFactor;
+
+    float getDistanceFromAB(vec2 a, vec2 b, vec2 p) {
+      vec2 l = b - a;
+      float l2 = dot( l, l );
+      float t = dot( p - a, l ) / l2;
+      if( t < 0.0 ) return distance( p, a );
+      if( t > 1.0 ) return distance( p, b );
+      vec2 projection = a + (l * t);
+      return distance( p, projection );
+    }
+
+    vec3 getIntersection(vec4 a, vec4 b) {
+      vec3 p = a.xyz;
+      vec3 q = b.xyz;
+      vec3 v = normalize( q - p );
+      float t = ( uNearPlaneValue - p.z ) / v.z;
+      return p + (v * t);
+    }
+
+
     void main() {
 
-      vec4 mvPosition = modelViewMatrix * vec4( position.x, position.y, position.z, 1 );
+      vec4 a = modelViewMatrix * vec4(uPointA, 1.0);
+      vec4 b = modelViewMatrix * vec4(uPointB, 1.0);
+      if(a.z > uNearPlaneValue) a.xyz = getIntersection(a, b);
+      if(b.z > uNearPlaneValue) b.xyz = getIntersection(a, b);
+      a = projectionMatrix * a; a /= a.w;
+      b = projectionMatrix * b; b /= b.w;
 
-      gl_Position = projectionMatrix * mvPosition;
+      vec4 mvPosition = modelViewMatrix * vec4( position.x, position.y, position.z, 1.0 );
+      vec4 p = projectionMatrix * mvPosition;
+      gl_Position = p;
+
+      p /= p.w;
+      float d = getDistanceFromAB(a.xy, b.xy, p.xy) * gl_Position.z;
+      vFactor = 1.0 - clamp(uMultiplier * d, 0.0, 1.0);
 
     }
 
   </script>
   <script type="x-shader/x-fragment" id="fragmentshader">
 
-    uniform vec3 color;
+    uniform vec3 uColor;
+    uniform vec3 uCoreColor;
+    uniform float uCoreOpacity;
+    uniform float uLowerBound;
+    uniform float uUpperBound;
+    uniform float uTransitionPower;
+    varying float vFactor;
 
     void main() {
-      gl_FragColor = vec4( color, 1.0 );
-
+      vec4 col = vec4(uColor, vFactor);
+      float factor = smoothstep(uLowerBound, uUpperBound, vFactor);
+      factor = pow(factor, uTransitionPower);
+      vec4 coreCol = vec4(uCoreColor, uCoreOpacity);
+      vec4 finalCol = mix(col, coreCol, factor);
+      gl_FragColor = finalCol;
     }
 
   </script>

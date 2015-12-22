@@ -21,6 +21,16 @@ export default class Saber extends THREE.Object3D {
 
     this.uniforms = {
       color: { type: 'c', value: new THREE.Color( 'blue' ) },
+      uPointA: {type: 'v3', value: new THREE.Vector3(0, -1, 0)},
+      uPointB: {type: 'v3', value: new THREE.Vector3(0, 1, 0)},
+      uColor: {type: 'c', value: new THREE.Color(1, 0, 0)},
+      uMultiplier: {type: 'f', value: 3.0},
+      uCoreColor: {type: 'c', value: new THREE.Color(1, 1, 1)},
+      uCoreOpacity: {type: 'f', value: 0.8},
+      uLowerBound: {type: 'f', value: 0.4},
+      uUpperBound: {type: 'f', value: 0.8},
+      uTransitionPower: {type: 'f', value: 2},
+      uNearPlaneValue: {type: 'f', value: -0.01},
     };
 
     this.material = new THREE.ShaderMaterial( {
