@@ -73,7 +73,6 @@ export default class Snow extends THREE.Object3D {
       this.particlesContainer.push( this.particles );
 
       this.add( this.particles );
-      console.log(this.particles);
     }
   }
 

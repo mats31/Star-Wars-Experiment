@@ -26,6 +26,8 @@ export default class Webgl {
 
     this.scene = new THREE.Scene();
 
+    this.start = false;
+
     this.camera = new THREE.PerspectiveCamera(50, width / height, 1, 10000);
     this.camera.position.z = 3000;
 
@@ -52,23 +54,30 @@ export default class Webgl {
     this.scene.add( this.saber );
     this.saber.position.z = 1500;
 
-    // this.snowflake = new Snowflake();
-    // this.snowflake.position.set(0, 0, 800);
-    // this.snowflake.scale.set(1, 1, 1);
-    // this.scene.add(this.snowflake);
-
     // this.cube = new Cube();
     // this.scene.add( this.cube );
 
     this.ground = new Plane();
-    //this.scene.add( this.ground );
+    this.scene.add( this.ground );
 
     this.snow = new Snow();
-    //this.scene.add( this.snow );
+    this.scene.add( this.snow );
     // this.scene.fog = new THREE.FogExp2( 0x000000, 0.0008 );
 
     // Random shots
     this.shots = [];
+
+    // Random snowflake
+    this.snowflakes = [];
+  }
+
+  startExperiment() {
+    this.saber.activeSaber();
+    this.start = true;
+  }
+
+  randomShot() {
+    this.processRandom = true;
     (function loop(that) {
       const rand = Math.round(Math.random() * (5000 - 1000)) + 1000;
       setTimeout(() => {
@@ -78,14 +87,18 @@ export default class Webgl {
         loop(that);
       }, rand);
     }(this));
+  }
 
-    // Random snowflake
-    this.snowflakes = [];
+  randomSnowflake() {
+    this.processRandom = true;
     (function loop(that) {
       const rand = Math.round(Math.random() * (3000 - 500)) + 500;
       setTimeout(() => {
-        if (that.tabIsActive) {
+        if (that.tabIsActive && typeof that.did == 'undefined') {
           that.snowflakePop();
+          // if (that.snowflakes.length == 2) {
+          //   that.did = true
+          // }
         }
         loop(that);
       }, rand);
@@ -170,16 +183,6 @@ export default class Webgl {
     }
   }
 
-  attackSaber() {
-    this.saber.animAttack();
-
-    for (let i = 0; i < this.snowflakes.length; i++) {
-      if ( this.snowflakes[i].position.x <= this.saber.position.x + 300 && this.snowflakes[i].position.x >= this.saber.position.x - 300 && this.snowflakes[i].position.y <= this.saber.position.y + 800 && this.snowflakes[i].position.y >= this.saber.position.y - 400 && this.snowflakes[i].position.z <= this.saber.position.z + 200 && this.snowflakes[i].position.z >= this.saber.position.z - 400 ) {
-        this.snowflakes[i].destroy();
-      }
-    }
-  }
-
   laserGame() {
     const shot = new Shot();
     const rand = Math.random();
@@ -204,7 +207,7 @@ export default class Webgl {
   snowflakePop() {
     const snowflake = new Snowflake();
 
-    snowflake.position.set( ( Math.random() * (700 - (-700)) + (-700) ), ( Math.random() * (400 - (10)) + (10) ), -1000);
+    snowflake.position.set( ( Math.random() * (1200 - (-1200)) + (-1200) ), ( Math.random() * (600 - (10)) + (10) ), ( Math.random() * (1200 - (-1000)) + (-1000) ) );
     this.snowflakes.push(snowflake);
     this.scene.add(snowflake);
   }
@@ -247,54 +250,103 @@ export default class Webgl {
     this.renderer.render(this.scene, this.camera);
 
     this.saber.update();
-    this.snow.update();
-    for (let i = 0; i < this.snowflakes.length; i++) {
-      this.snowflakes[i].update();
-    }
-    this.setVolume();
 
-    /* Shots */
-    for (let i = 0; i < this.shots.length; i++) {
-      if (this.shots[i].parade) {
-        this.shots[i].position.z -= 40;
-      } else {
-        // if ( this.checkParade( this.shots[i] ) ) {
-        //   break;
-        // }
-        this.checkParade( this.shots[i] );
-        this.shots[i].position.z += ( 5000 - this.shots[i].position.z ) * 0.02;
-        this.shots[i].position.x += -this.shots[i].position.x * 0.01;
-        this.shots[i].position.y += -this.shots[i].position.y * 0.01;
+    if (this.start) {
+      if (!this.processRandom) {
+        this.randomShot();
+        this.randomSnowflake();
+      }
+      this.snow.update();
+      for (let i = 0; i < this.snowflakes.length; i++) {
+        this.snowflakes[i].update();
+        if (this.snowflakes[i].destroyed || this.snowflakes[i].timeout) {
+          this.scene.remove(this.snowflakes[i]);
+          this.snowflakes.splice(i, 1);
+          if (typeof this.shots[0] !== 'undefined') {
+            if (this.shots[0].parade) {
+              this.shots[0].paradeBis = true;
+            }
+          }
+          break;
+        }
+      }
+      this.setVolume();
+
+      /* Shots */
+      for (let i = 0; i < this.shots.length; i++) {
+        if (this.shots[i].parade) {
+          if (this.snowflakes.length > 0) {
+
+            if (this.shots[i].paradeBis) {
+              this.shots[i].position.z -= 40;
+            } else {
+              this.shots[i].position.x += (this.snowflakes[0].position.x - this.shots[i].position.x) * 0.2;
+              this.shots[i].position.y += (this.snowflakes[0].position.y - this.shots[i].position.y) * 0.2;
+              this.shots[i].position.z += (this.snowflakes[0].position.z - this.shots[i].position.z) * 0.2;
+            }
+
+            if (this.shots[i].position.x >= this.snowflakes[0].position.x - 10 && this.shots[i].position.x <= this.snowflakes[0].position.x + 10 && this.shots[i].position.y >= this.snowflakes[0].position.y - 10 && this.shots[i].position.y <= this.snowflakes[0].position.y + 10 && this.shots[i].position.z >= this.snowflakes[0].position.z - 10 && this.shots[i].position.z <= this.snowflakes[0].position.z + 10) {
+              this.snowflakes[0].destroy();
+              this.scene.remove(this.shots[i]);
+              this.shots.splice(i, 1);
+            }
+            // for (let j = 0; j < this.snowflakes.length; j++) {
+            //   if (this.shots[i].position.x >= this.snowflakes[j].position.x - 10 && this.shots[i].position.x <= this.snowflakes[j].position.x + 10 && this.shots[i].position.y >= this.snowflakes[j].position.y - 10 && this.shots[i].position.y <= this.snowflakes[j].position.y + 10 && this.shots[i].position.z >= this.snowflakes[j].position.z - 10 && this.shots[i].position.z <= this.snowflakes[j].position.z + 10) {
+            //     this.snowflakes[j].destroy();
+            //     this.scene.remove(this.shots[i]);
+            //     this.shots.splice(i, 1);
+            //     break;
+            //   }
+            //   this.shots[i].position.x += (this.snowflakes[j].position.x - this.shots[i].position.x) * 0.2;
+            //   this.shots[i].position.y += (this.snowflakes[j].position.y - this.shots[i].position.y) * 0.2;
+            //   this.shots[i].position.z += (this.snowflakes[j].position.z - this.shots[i].position.z) * 0.2;
+            //   break;
+            // }
+          } else {
+            this.shots[i].position.z -= 40;
+          }
+        } else {
+          // if ( this.checkParade( this.shots[i] ) ) {
+          //   break;
+          // }
+          this.checkParade( this.shots[i] );
+          this.shots[i].position.z += ( 5000 - this.shots[i].position.z ) * 0.02;
+          this.shots[i].position.x += -this.shots[i].position.x * 0.01;
+          this.shots[i].position.y += -this.shots[i].position.y * 0.01;
+        }
+        if (typeof this.shots[i] !== 'undefined') {
+          if (this.shots[i].position.z > 3000 || this.shots[i].position.z < -1100) {
+            this.scene.remove(this.shots[i]);
+            this.shots.splice(i, 1);
+          }
+        }
       }
 
-      if (this.shots[i].position.z > 3000 || this.shots[i].position.z < -1100) {
-        this.scene.remove(this.shots[i]);
-        this.shots.splice(i, 1);
+      /* Snowflakes */
+      // for (let i = 0; i < this.snowflakes.length; i++) {
+      //   this.snowflakes[i].position.z += ( 5000 - this.snowflakes[i].position.z ) * 0.02;
+      //   this.snowflakes[i].position.x += -this.snowflakes[i].position.x * 0.01;
+      //   this.snowflakes[i].position.y += -this.snowflakes[i].position.y * 0.01;
+      //
+      //   if (this.snowflakes[i].position.z > 3000) {
+      //     this.scene.remove(this.snowflakes[i]);
+      //     this.snowflakes.splice(i, 1);
+      //   }
+      // }
+
+      if (this.params.usePostprocessing) {
+        // this.composer.render();
+
+        this.renderer.autoClearColor = true;
+        this.composer.reset();
+        this.composer.render(this.scene, this.camera);
+        this.composer.pass(this.vignette);
+        this.composer.pass(this.bloomPass);
+        this.composer.pass(this.fxaa);
+        this.composer.toScreen();
       }
-    }
-
-    /* Snowflakes */
-    for (let i = 0; i < this.snowflakes.length; i++) {
-      this.snowflakes[i].position.z += ( 5000 - this.snowflakes[i].position.z ) * 0.02;
-      this.snowflakes[i].position.x += -this.snowflakes[i].position.x * 0.01;
-      this.snowflakes[i].position.y += -this.snowflakes[i].position.y * 0.01;
-
-      if (this.snowflakes[i].position.z > 3000) {
-        this.scene.remove(this.snowflakes[i]);
-        this.snowflakes.splice(i, 1);
-      }
-    }
-
-    if (this.params.usePostprocessing) {
-      // this.composer.render();
-
-      this.renderer.autoClearColor = true;
-      this.composer.reset();
-      this.composer.render(this.scene, this.camera);
-      this.composer.pass(this.vignette);
-      this.composer.pass(this.bloomPass);
-      this.composer.pass(this.fxaa);
-      this.composer.toScreen();
+    } else {
+      this.snow.update();
     }
   }
 }

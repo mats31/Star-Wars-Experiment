@@ -20,12 +20,10 @@ export default class Plane extends THREE.Object3D {
         loader.load(
           'textures/noise.jpg',
           ( noise ) => {
-            console.log( noise );
             this.uniforms = this.planeShader.uniforms;
             this.uniforms.map.value = map;
             this.uniforms.noise.value = noise;
             this.uniforms.diffuse.value = new THREE.Color(0xFFFFFF);
-            console.log(this.uniforms);
             this.material = new THREE.ShaderMaterial( {
               uniforms: this.uniforms,
               vertexShader: this.planeShader.vertexShader,

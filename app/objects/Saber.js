@@ -7,12 +7,18 @@ export default class Saber extends THREE.Object3D {
   constructor() {
     super();
 
-    this.active = true;
+    this.active = false;
+    this.loaded = false;
 
     const manager = new THREE.LoadingManager();
     const loader = new THREE.OBJLoader( manager );
     loader.load( 'model/saber.obj', ( object ) => {
       this.add( object );
+      this.setPresentation();
+    }, ( request ) => {
+      const percent = request.loaded / request.total * 100;
+      const value = 1444.4 - ( 1444.4 * ( percent / 100 ) );
+      document.getElementById('loader').setAttribute('stroke-dashoffset', value);
     });
 
     const geometry = new THREE.CylinderGeometry( 5, 12, 1000, 32 );
@@ -21,16 +27,16 @@ export default class Saber extends THREE.Object3D {
 
     this.uniforms = {
       color: { type: 'c', value: new THREE.Color( 'blue' ) },
-      uPointA: {type: 'v3', value: new THREE.Vector3(0, -1, 0)},
-      uPointB: {type: 'v3', value: new THREE.Vector3(0, 1, 0)},
-      uColor: {type: 'c', value: new THREE.Color(1, 0, 0)},
-      uMultiplier: {type: 'f', value: 3.0},
-      uCoreColor: {type: 'c', value: new THREE.Color(1, 1, 1)},
-      uCoreOpacity: {type: 'f', value: 0.8},
-      uLowerBound: {type: 'f', value: 0.4},
-      uUpperBound: {type: 'f', value: 0.8},
-      uTransitionPower: {type: 'f', value: 2},
-      uNearPlaneValue: {type: 'f', value: -0.01},
+      // uPointA: {type: 'v3', value: new THREE.Vector3(0, -1, 0)},
+      // uPointB: {type: 'v3', value: new THREE.Vector3(0, 1, 0)},
+      // uColor: {type: 'c', value: new THREE.Color(1, 0, 0)},
+      // uMultiplier: {type: 'f', value: 3.0},
+      // uCoreColor: {type: 'c', value: new THREE.Color(1, 1, 1)},
+      // uCoreOpacity: {type: 'f', value: 0.8},
+      // uLowerBound: {type: 'f', value: 0.4},
+      // uUpperBound: {type: 'f', value: 0.8},
+      // uTransitionPower: {type: 'f', value: 2},
+      // uNearPlaneValue: {type: 'f', value: -0.01},
     };
 
     this.material = new THREE.ShaderMaterial( {
@@ -73,6 +79,10 @@ export default class Saber extends THREE.Object3D {
     }
     this.add( this.cylinder );
 
+    for (let i = 0, i3 = 0; i < this.cylinder.geometry.attributes.position.array.length; i++, i3 += 3) {
+      this.cylinder.geometry.attributes.position.array[i3 + 1] = -500;
+    }
+
     // window.addEventListener('click', () => {
     //   if (!this.active) {
     //     document.getElementById('degaine').pause();
@@ -101,6 +111,22 @@ export default class Saber extends THREE.Object3D {
     // });
   }
 
+  activeSaber() {
+    document.getElementById('degaine').pause();
+    document.getElementById('degaine').currentTime = 0;
+    document.getElementById('degaine').play();
+    this.active = true;
+  }
+
+  setPresentation() {
+    document.querySelector('.light1').className = 'light light1 active';
+    document.querySelector('.light2').className = 'light light2 active';
+    document.querySelector('.light3').className = 'light light3 active';
+    document.querySelector('.light4').className = 'light light4 active';
+    document.querySelector('.title').className = 'title active';
+    document.querySelector('.description').className = 'description active';
+  }
+
   animParade() {
     const tl = new TimelineLite();
     const rand = Math.floor( Math.random() * ( 4 - 1 ) ) + 1;
@@ -126,34 +152,6 @@ export default class Saber extends THREE.Object3D {
       tl.to(this.rotation, 0.25, {z: 0, x: 0});
       break;
     }
-  }
-
-  animAttack() {
-    const tl = new TimelineLite();
-    const rand = Math.floor( Math.random() * ( 5 - 1 ) ) + 1;
-
-    switch (rand) {
-      case 1:
-      tl.to(this.rotation, 0.25, {z: -Math.PI / 4, x: Math.PI / 6});
-      tl.to(this.rotation, 0.25, {z: 0, x: 0});
-      case 2:
-      tl.to(this.rotation, 0.25, {z: Math.PI / 4, x: -Math.PI / 5});
-      tl.to(this.rotation, 0.25, {z: 0, x: 0});
-      break;
-      case 3:
-      tl.to(this.rotation, 0.25, {z: -Math.PI / 4, x: Math.PI / 4});
-      tl.to(this.rotation, 0.25, {z: 0, x: 0});
-      break;
-      case 4:
-      tl.to(this.rotation, 0.25, {z: Math.PI / 4, x: -Math.PI / 3});
-      tl.to(this.rotation, 0.25, {z: 0, x: 0});
-      break;
-      default:
-      tl.to(this.rotation, 0.25, {z: -Math.PI / 5, x: -Math.PI / 5});
-      tl.to(this.rotation, 0.25, {z: 0, x: 0});
-      break;
-    }
-
   }
 
   update() {

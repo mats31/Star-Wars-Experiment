@@ -10,6 +10,9 @@ export default class Snowflake extends THREE.Object3D {
   constructor() {
     super();
 
+    this.destroyed = false;
+    this.timeout = false;
+
     const self = this;
 
     this.manager = new THREE.LoadingManager();
@@ -107,21 +110,23 @@ export default class Snowflake extends THREE.Object3D {
         }
       });
       self.add(loadedObject);
+      this.time = 0;
     }, this.manager.onProgress, onError );
   }
 
   destroy() {
-    TweenMax.to(material.uniforms.ice, 1, {value: 2000.0, ease: Power2.easeOut});
-    TweenMax.to(material.uniforms.space, 1, {value: 150.0, ease: Power2.easeOut});
+    this.time = -999;
+    TweenMax.to(this.children[0].children[0].material.uniforms.ice, 1, {value: 2000.0, ease: Power2.easeOut});
+    TweenMax.to(this.children[0].children[0].material.uniforms.space, 1, {value: 150.0, ease: Power2.easeOut, onComplete: () => {
+      this.destroyed = true;
+    }});
   }
 
   update() {
-    material.uniforms.time.value = 0.00025 * ( Date.now() - start );
-    if (loadedObject) {
-      loadedObject.rotation.y += 0.1;
-      loadedObject.rotation.x += 0.001;
-      // particleSystem.rotation.y += 0.02;
-      // particleSystem.rotation.x -= 0.01;
+    this.rotation.y -= 0.01;
+    this.time += 0.01;
+    if (this.time > 1.5) {
+      this.timeout = true;
     }
   }
 }

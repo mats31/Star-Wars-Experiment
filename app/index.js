@@ -48,9 +48,6 @@ window.addEventListener('resize', resizeHandler);
 // Mouse move
 window.addEventListener('mousemove', onDocumentMouseMove);
 
-// Mouse click
-window.addEventListener('click', onDocumentClick);
-
 // Tests tab active
 window.onfocus = function onFocus() {
   webgl.tabIsActive = true;
@@ -59,6 +56,20 @@ window.onfocus = function onFocus() {
 window.onblur = function onBlur() {
   webgl.tabIsActive = false;
 };
+
+document.getElementById('start').addEventListener('click', () => {
+  document.querySelector('.light1').className = 'light light1';
+  document.querySelector('.light2').className = 'light light2';
+  document.querySelector('.light3').className = 'light light3';
+  document.querySelector('.light4').className = 'light light4';
+  document.querySelector('.title').className = 'title';
+  document.querySelector('.description').className = 'description';
+  document.querySelector('.presentation').className = 'presentation disable';
+  setTimeout(() => {
+    document.querySelector('.presentation').parentNode.removeChild(document.querySelector('.presentation'));
+  }, 1600);
+  webgl.startExperiment();
+});
 
 // let's play !
 animate();
