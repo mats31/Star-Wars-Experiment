@@ -1,7 +1,9 @@
-threejs-starter-kit
+Star Wars Experiment
 ===================
 
 It uses Three.js and Greensock as depencies.
+
+You can see the render here : wwww.mathis-biabiany.fr/lab/starwars
 
 After cloning install all dependencies :
 ```bash
@@ -10,7 +12,7 @@ npm i
 
 ## Task
 ### Start development
-It starts a developement server at [localhost:9966](http://localhost:9966) with live reload.
+It starts a developement server with live reload.
 ```bash
 npm start
 ```
