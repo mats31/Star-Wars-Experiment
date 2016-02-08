@@ -3,7 +3,7 @@ Star Wars Experiment
 
 It uses Three.js and Greensock as depencies.
 
-You can see the render here : wwww.mathis-biabiany.fr/lab/starwars
+You can see the render here : [www.mathis-biabiany.fr/lab/starwars](www.mathis-biabiany.fr/lab/starwars)
 
 After cloning install all dependencies :
 ```bash
